@@ -1,0 +1,9 @@
+<xml>
+    <ToUserName>测试中文</ToUserName>
+    <FromUserName>openid</FromUserName>
+    <CreateTime>12345678</CreateTime>
+    <MsgType>EVENT</MsgType>
+    <Event>SCAN</Event>
+    <EventKey>qrscene_abcde</EventKey>
+    <Ticket>ticket</Ticket>
+</xml>
