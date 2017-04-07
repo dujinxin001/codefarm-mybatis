@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.ExecutorException;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.BaseStatementHandler;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -29,6 +30,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
+import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;
@@ -86,6 +88,13 @@ public class PaginationInterceptor implements Interceptor {
 			PreparedStatement countStmt = connection.prepareStatement(countSql);
 			BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql,
 					boundSql.getParameterMappings(), parameter);
+			Field metaParametersField = Reflections.getAccessibleField(boundSql, "metaParameters");
+			if(metaParametersField!=null){
+				MetaObject fieldValue = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
+				//MetaObject metaObjectForProperty = fieldValue.metaObjectForProperty("__frch_item_2");
+				String[] getterNames = fieldValue.getGetterNames();
+				Reflections.setFieldValue(countBS, "metaParameters", fieldValue);
+			}
 			setParameters(countStmt, mappedStatement, countBS, parameter);
 			ResultSet rs = countStmt.executeQuery();
 			int count = 0;
@@ -136,6 +145,7 @@ public class PaginationInterceptor implements Interceptor {
 
 	private void setParameters(PreparedStatement ps, MappedStatement mappedStatement, BoundSql boundSql,
 			Object parameterObject) throws SQLException {
+        
 		ErrorContext.instance().activity("setting parameters").object(mappedStatement.getParameterMap().getId());
 		List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
 		parameterMappings = mappedStatement.getBoundSql(parameterObject).getParameterMappings();
@@ -155,14 +165,21 @@ public class PaginationInterceptor implements Interceptor {
 						value = parameterObject;
 					} else if (boundSql.hasAdditionalParameter(propertyName)) {
 						value = boundSql.getAdditionalParameter(propertyName);
-					} else if (propertyName.startsWith(ForEachSqlNode.ITEM_PREFIX)
-							&& boundSql.hasAdditionalParameter(prop.getName())) {
-						value = boundSql.getAdditionalParameter(prop.getName());
-						if (value != null) {
-							value = configuration.newMetaObject(value)
-									.getValue(propertyName.substring(prop.getName().length()));
-						}
-					} else {
+					} 
+//					else if (propertyName.startsWith(ForEachSqlNode.ITEM_PREFIX)
+//							&& boundSql.hasAdditionalParameter(prop.getName())) {
+//						value = boundSql.getAdditionalParameter(prop.getName());
+//						if (value != null) {
+//							value = configuration.newMetaObject(value)
+//									.getValue(propertyName.substring(prop.getName().length()));
+//						}
+//					} 
+					else if (propertyName.startsWith(ForEachSqlNode.ITEM_PREFIX)){
+						MetaObject fieldValue = (MetaObject) Reflections.getFieldValue(boundSql, "metaParameters");
+						String[] getterNames = fieldValue.getGetterNames();
+						value=fieldValue.metaObjectForProperty(propertyName).getOriginalObject();
+					}
+					else {
 						value = metaObject == null ? null : metaObject.getValue(propertyName);
 					}
 					TypeHandler typeHandler = parameterMapping.getTypeHandler();

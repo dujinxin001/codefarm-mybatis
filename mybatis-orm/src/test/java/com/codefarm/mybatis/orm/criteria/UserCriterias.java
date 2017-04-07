@@ -21,6 +21,17 @@ public class UserCriterias extends Pagable {
 	@Criteria(column = "id")
 	private Long[] userIds;
 
+	@Criteria(column = "username")
+	private String[] userNames=null;
+
+	public String[] getUserNames() {
+		return userNames;
+	}
+
+	public void setUserNames(String[] userNames) {
+		this.userNames = userNames;
+	}
+
 	@Criteria(column = "birthday", operator = Operator.LESS)
 	private Date birthDay;
 

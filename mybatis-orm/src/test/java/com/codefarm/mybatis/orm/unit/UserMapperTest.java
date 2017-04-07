@@ -37,7 +37,7 @@ public class UserMapperTest {
 		return user;
 	}
 
-	@Test
+	
 	public void testSelectOrderby() {
 		// userMapper.selectByCriterias(new UserCriterias());
 		// userMapper.selectAndOrderBy("");
@@ -160,6 +160,17 @@ public class UserMapperTest {
 		Assert.assertTrue(rows == 2);
 		rows = userMapper.deleteByCriteriasAndUserName(criterias, "ABC");
 		Assert.assertTrue(rows == 0);
+	}
+	@Test
+	public void testPageWithIn(){
+		UserCriterias uc=new UserCriterias();
+		Long [] ids=new Long[]{1111l,22222l,33333l};
+		String [] names=new String[]{"a","b"};
+		uc.setUserIds(ids);
+		uc.setUserNames(names);
+		uc.setUserid(44444l);
+		uc.setPagable(true);
+		userMapper.selectByCriterias(uc);
 	}
 
 	private List<User> buildUserList() {
