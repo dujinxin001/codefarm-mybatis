@@ -138,7 +138,10 @@ public class CriteriaSqlNodeBuilder extends SqlNodeBuilder
                 sb.append(prefix);
                 sb.append(field.getName());
                 sb.append("}");
-                sb.append(" AND ");
+                sb.append(" ");
+                sb.append(annotation.link().getLink());
+                sb.append(" ");
+//                sb.append(" AND ");
                 String test = buildIfTest(prefix, field);
                 contents.add(
                         new IfSqlNode(new TextSqlNode(sb.toString()), test));

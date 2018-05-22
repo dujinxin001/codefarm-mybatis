@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.codefarm.mybatis.orm.enums.Link;
 import com.codefarm.mybatis.orm.enums.Operator;
 
 /**
@@ -17,6 +18,8 @@ import com.codefarm.mybatis.orm.enums.Operator;
 public @interface Criteria
 {
     String column();
+    
+    Link link() default Link.AND;
     
     Operator operator() default Operator.EQUAL;
 }

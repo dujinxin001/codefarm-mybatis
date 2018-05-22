@@ -8,7 +8,7 @@ package com.codefarm.mybatis.orm.enums;
 public enum Operator
 {
     EQUAL("="), GREATER(">"), LESS("<"), GREATERANDEQUAL(">="), LESSANDEQUAL(
-            "<="), LIKE("like");
+            "<="), LIKE("like"),NOTEQUAL("<>"),OR("or");
     private String operator;
     
     private Operator(String operator)
